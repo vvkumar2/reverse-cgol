@@ -1,24 +1,39 @@
 import subprocess
+import os
+import logging
 
-def run_command(command):
-    """Run shell commands in the specified working directory."""
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+def run_command(command, working_directory=None):
     try:
-        subprocess.check_call(command, shell=True)
-        print(f"Executed: {command}")
+        if working_directory:
+            cwd = os.getcwd()
+            os.chdir(working_directory)
+            subprocess.check_call(command, shell=True)
+            os.chdir(cwd)
+        else:
+            subprocess.check_call(command, shell=True)
+        logger.info(f"Command executed: {command}")
 
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e}")
+        logger.error(f"Error executing command: {command}")
+        logger.error(f"Error: {e}")
 
-def main():
-    # Clone the SBVA repository
+
+def setup_project():
+    # Load SBVA
     run_command("git clone https://github.com/hgarrereyn/SBVA.git")
-    run_command("cd SBVA && curl -L https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz -o eigen-3.4.0.tar.gz")
-    run_command("cd SBVA && tar xf eigen-3.4.0.tar.gz")
-    run_command("cd SBVA && make")
+    run_command("curl -L https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz -o eigen-3.4.0.tar.gz", working_directory="SBVA")
+    run_command("tar xf eigen-3.4.0.tar.gz", working_directory="SBVA")
+    run_command("make", working_directory="SBVA")
+    logger.info("SBVA setup complete.")
 
-    # Clone the Kissat SAT solver
+    # Load Kissat
     run_command("git clone https://github.com/arminbiere/kissat.git")
-    run_command("cd kissat && ./configure && make all")
+    run_command("./configure && make all", working_directory="kissat")
+    logger.info("Kissat setup complete.")
 
 if __name__ == "__main__":
-    main()
+    setup_project()
