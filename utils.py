@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import convolve2d
 from sympy.logic import POSform
 import logging
+from font import character_matrices
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -149,3 +150,23 @@ def save_state(state, delta):
         for row in state:
             file.write(','.join(str(cell) for cell in row) + '\n')
 
+
+def word_to_grid(word, padding=5):
+    word = word.upper()
+    grid_height = len(next(iter(character_matrices.values())))
+
+    total_width = sum(len(character_matrices[char][0]) + 1 for char in word if char in character_matrices) - 1
+    total_width += 2 * padding
+
+    grid = [[0] * total_width for _ in range(grid_height + 2 * padding)]
+
+    start_col = padding
+    for row_idx in range(grid_height):
+        col_idx = start_col
+        for char in word:
+            if char in character_matrices:
+                char_width = len(character_matrices[char][row_idx])
+                for i in range(char_width):
+                    grid[row_idx + padding][col_idx + i] = character_matrices[char][row_idx][i]
+                col_idx += char_width + 1
+    return grid

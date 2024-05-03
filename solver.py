@@ -21,6 +21,7 @@ def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False):
         return None
 
     W, H = np.shape(puzzle)
+
     clauses = get_clauses(puzzle, W, H, second_neighbors=second_neighbors)
     nb = clauses.count('\n')
     filename = 'puzzle.cnf'
@@ -60,7 +61,8 @@ def parse_solution(solution, W, H):
 def main():
     parser = argparse.ArgumentParser(description='Solve the Game of Life puzzle using SAT solvers.')
     parser.add_argument('--setup', action='store_true', help='Trigger project setup.')
-    parser.add_argument('--puzzle', type=str, required=True, help='Filename of the puzzle file.')
+    parser.add_argument('--puzzle', type=str, help='Filename of the puzzle file (optional).')
+    parser.add_argument('--word', type=str, help='Word to convert into a puzzle (optional).')
     parser.add_argument('--keep_cnf', action='store_true', help='Keep the CNF file after solving.')
 
     args = parser.parse_args()
@@ -73,16 +75,24 @@ def main():
         logger.error("SBVA and/or kissat not found. Run with --setup flag.")
         return
 
-    initial_state = load_puzzle(args.puzzle)
-    if initial_state is None:
-        logger.error("Failed to load the initial puzzle state.")
+    if args.puzzle:
+        initial_state = load_puzzle(args.puzzle)
+        if initial_state is None:
+            logger.error("Failed to load the initial puzzle state from file.")
+            return
+    elif args.word:
+        initial_state = word_to_grid(args.word)
+        logger.info(f"Generated grid from word '{args.word.upper()}'.")
+    else:
+        logger.error("No puzzle file or word provided. Please specify one.")
         return
 
     state, prev_state = initial_state, None
     start_time, max_iterations = time.time(), 100
 
     for iteration_count in range(max_iterations):
-        state = solve(puzzle=state, 
+        prev_state = state
+        state = solve(puzzle=prev_state, 
                       start_time=start_time, 
                       keep_cnf=args.keep_cnf)
         
@@ -93,8 +103,6 @@ def main():
                           keep_cnf=args.keep_cnf)
             if state is None:
                 break
-
-        prev_state = state
 
     logger.info(f"{iteration_count} previous states found.")
     if prev_state is not None:
