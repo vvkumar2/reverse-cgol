@@ -3,6 +3,7 @@ SBVA/
 kissat/
 venv/
 
+input.txt
+output.txt
 *.png
-*.txt
 *.cnf
