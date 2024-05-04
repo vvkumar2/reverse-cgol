@@ -42,7 +42,7 @@ def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False):
         logger.info("Puzzle is UNSAT")
         return None
 
-    logger.info("Puzzle Solved")
+    logger.info("Puzzle Iteration Solved")
     return parse_solution(solution, W, H)
 
 
@@ -57,6 +57,29 @@ def parse_solution(solution, W, H):
                 solution_grid[x, y] = 1
     return solution_grid
 
+
+def solve_loop(initial_state, keep_cnf):
+    state, prev_state = initial_state, None
+    start_time, max_iterations = time.time(), 100
+
+    for iteration_count in range(max_iterations):
+        prev_state = state
+        state = solve(puzzle=prev_state, 
+                      start_time=start_time, 
+                      keep_cnf=keep_cnf)
+        
+        if state is None or not np.any(state):
+            state = solve(puzzle=prev_state, 
+                          start_time=start_time, 
+                          second_neighbors=True, 
+                          keep_cnf=keep_cnf)
+            if state is None:
+                break
+    
+    logger.info(f"Found {iteration_count} previous states.")
+    
+    return prev_state, iteration_count
+    
 
 def main():
     parser = argparse.ArgumentParser(description='Solve the Game of Life puzzle using SAT solvers.')
@@ -87,24 +110,8 @@ def main():
         logger.error("No puzzle file or word provided. Please specify one.")
         return
 
-    state, prev_state = initial_state, None
-    start_time, max_iterations = time.time(), 100
+    prev_state, iteration_count = solve_loop(initial_state, args.keep_cnf)
 
-    for iteration_count in range(max_iterations):
-        prev_state = state
-        state = solve(puzzle=prev_state, 
-                      start_time=start_time, 
-                      keep_cnf=args.keep_cnf)
-        
-        if state is None or not np.any(state):
-            state = solve(puzzle=prev_state, 
-                          start_time=start_time, 
-                          second_neighbors=True, 
-                          keep_cnf=args.keep_cnf)
-            if state is None:
-                break
-
-    logger.info(f"{iteration_count} previous states found.")
     if prev_state is not None:
         save_state(prev_state, iteration_count)
         plot_game_of_life(prev_state, num_transitions=iteration_count+1)

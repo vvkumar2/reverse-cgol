@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import convolve2d
 from sympy.logic import POSform
+from matplotlib.colors import LinearSegmentedColormap
 import logging
 from font import character_matrices
 
@@ -98,25 +99,32 @@ def life_step(X):
     return (neighbor_count == 3) | ((X == 1) & (neighbor_count == 2))
 
 
-def plot_game_of_life(initial_state, num_transitions):
+def plot_game_of_life(initial_state, num_transitions, states_per_row=5):
     """Plot the Game of Life states in a grid layout."""
+    colors = ["#0c1016", "#ffffff"]  # Dark grey for dead cells, white for live cells
+    cmap = LinearSegmentedColormap.from_list("custom_binary", colors, N=2)
+
     state = initial_state.copy()
-    rows = (num_transitions + 4) // 5
-    fig, axes = plt.subplots(nrows=rows, ncols=5, figsize=(15, 3 * rows))
+    rows = (num_transitions + 4) // states_per_row
+    fig, axes = plt.subplots(nrows=rows, ncols=states_per_row, figsize=(15, 3 * rows))
     if rows == 1:
         axes = [axes]
-    for i in range(num_transitions, rows * 5):
-        fig.delaxes(axes[i // 5][i % 5])
+    for i in range(num_transitions, rows * states_per_row):
+        fig.delaxes(axes[i // states_per_row][i % states_per_row])
     for i in range(num_transitions):
-        ax = axes[i // 5][i % 5]
-        ax.imshow(state, cmap='Greys', interpolation='nearest')
-        ax.set_title(f"Generation {i + 1}")
+        ax = axes[i // states_per_row][i % states_per_row]
+        ax.imshow(state, cmap=cmap)
+        ax.set_title(f"Generation {i + 1}", color='white')
         ax.grid(False)
         ax.axis('off')
         state = life_step(state)
+    
+    fig.patch.set_facecolor('#0c1016')
+    ax.set_facecolor('#0c1016')
+
     plt.savefig('game_of_life.png', format='png', dpi=300)
     plt.tight_layout()
-    plt.show()
+    return fig
 
 
 def load_puzzle(filename):
@@ -146,7 +154,7 @@ def load_puzzle(filename):
 
 
 def save_state(state, delta):
-    with open(f'output_delta_{delta}.txt', 'w') as file:
+    with open(f'output.txt', 'w') as file:
         for row in state:
             file.write(','.join(str(cell) for cell in row) + '\n')
 
