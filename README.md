@@ -1,4 +1,5 @@
 # Game of Life SAT Solver
+The Game of Life SAT Solver is hosted at [URL](http://18.118.210.39:8501/).
 
 ## Overview
 The Game of Life SAT Solver is a sophisticated tool developed to tackle the inherent non-reversibility of Conway's Game of Life, a cellular automaton devised by the British mathematician John Horton Conway in 1970. Unlike forward operations in the Game of Life, determining previous states is not straightforward due to its non-reversible nature. This tool transforms the problem into a boolean satisfiability (SAT) problem, allowing it to discover one of the potentially infinite previous states of a given configuration. This approach provides unique insights and facilitates deeper research into cellular automaton behaviors.
