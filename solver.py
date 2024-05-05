@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 
-def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False):
+def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False, file_location=''):
     """Attempt to solve the Game of Life puzzle using SAT solver."""
     budget = TIME_BUDGET - (time.time() - start_time)
     budget = min(budget, MAX_BUDGET)
@@ -24,13 +24,13 @@ def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False):
 
     clauses = get_clauses(puzzle, W, H, second_neighbors=second_neighbors)
     nb = clauses.count('\n')
-    filename = 'puzzle.cnf'
+    filename = f'{file_location}puzzle.cnf'
 
     with open(filename, 'w') as f:
         f.write(f'p cnf {W*H} {nb}\n')
         f.write(clauses)
 
-    preprocessed_filename = 'preprocessed_puzzle.cnf'
+    preprocessed_filename = f'{file_location}preprocessed_puzzle.cnf'
     subprocess.run(['./SBVA/sbva', '-i', filename, '-o', preprocessed_filename])
     solution = subprocess.run(["./kissat/build/kissat", "-q", preprocessed_filename], stdout=subprocess.PIPE).stdout.decode('utf8')
 
@@ -58,7 +58,7 @@ def parse_solution(solution, W, H):
     return solution_grid
 
 
-def solve_loop(initial_state, keep_cnf):
+def solve_loop(initial_state, keep_cnf, file_location=''):
     state, prev_state = initial_state, None
     start_time, max_iterations = time.time(), 100
 
@@ -66,13 +66,15 @@ def solve_loop(initial_state, keep_cnf):
         prev_state = state
         state = solve(puzzle=prev_state, 
                       start_time=start_time, 
-                      keep_cnf=keep_cnf)
+                      keep_cnf=keep_cnf,
+                      file_location=file_location)
         
         if state is None or not np.any(state):
             state = solve(puzzle=prev_state, 
                           start_time=start_time, 
                           second_neighbors=True, 
-                          keep_cnf=keep_cnf)
+                          keep_cnf=keep_cnf,
+                          file_location=file_location)
             if state is None:
                 break
     
@@ -104,7 +106,12 @@ def main():
             logger.error("Failed to load the initial puzzle state from file.")
             return
     elif args.word:
-        initial_state = word_to_grid(args.word)
+        word_length = len(args.word)
+        if word_length > 5:
+            padding = 8
+        elif word_length > 8:
+            padding = 10
+        initial_state = word_to_grid(args.word, padding=padding)
         logger.info(f"Generated grid from word '{args.word.upper()}'.")
     else:
         logger.error("No puzzle file or word provided. Please specify one.")

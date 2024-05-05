@@ -26,8 +26,16 @@ def main():
 
     if input_method == 'Word':
         word = st.text_input('Enter a word:')
+        
+        if len(word) > 8:
+            padding = 10
+        elif len(word) > 5:
+            padding = 8
+        else:
+            padding = 5
+
         if word:
-            grid = word_to_grid(word.upper())
+            grid = word_to_grid(word.upper(), padding=padding)
             st.text('Reversing from the following grid:')
             fig = plot_grid(grid, title="Initial Grid")
             st.pyplot(fig)
@@ -46,7 +54,7 @@ def main():
         status_text = st.empty()
         status_text.write('Solving for the earliest possible state (this might take a couple minutes)...')
 
-        result, num_iterations = solve_loop(grid, False)
+        result, num_iterations = solve_loop(grid, False, file_location='/app/')
         status_text.empty()
 
         if result is not None:

@@ -153,7 +153,7 @@ def load_puzzle(filename):
         return None
 
 
-def save_state(state, delta):
+def save_state(state):
     with open(f'output.txt', 'w') as file:
         for row in state:
             file.write(','.join(str(cell) for cell in row) + '\n')
