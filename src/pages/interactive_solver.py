@@ -1,9 +1,13 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import streamlit as st
-import time
 from matplotlib import pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from solver import solve_loop
 from utils import word_to_grid, plot_game_of_life
-from matplotlib.colors import LinearSegmentedColormap
+
 
 def plot_grid(grid, title):
     colors = ["#0c1016", "#ffffff"]  # Dark grey for dead cells, white for live cells
