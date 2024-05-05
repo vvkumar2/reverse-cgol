@@ -32,14 +32,11 @@ RUN git clone https://github.com/hgarrereyn/SBVA.git /app/SBVA \
     && tar -xzf /app/SBVA/eigen-3.4.0.tar.gz \
     && make
 
-# Expose the port the app runs on
-EXPOSE 8501
-
 # Set env variables
 ENV PORT=8501
 ENV HOST=0.0.0.0
 
 
 # Run app.py when the container launches
-CMD streamlit run app.py --server.port $PORT --server.address $HOST
+CMD streamlit run src/app.py --server.port $PORT --server.address $HOST
 

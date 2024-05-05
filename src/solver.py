@@ -31,7 +31,7 @@ def solve(puzzle, start_time, second_neighbors=False, keep_cnf=False, file_locat
         f.write(clauses)
 
     preprocessed_filename = f'{file_location}preprocessed_puzzle.cnf'
-    subprocess.run(['./SBVA/sbva', '-i', filename, '-o', preprocessed_filename])
+    subprocess.run(['SBVA/sbva', '-i', filename, '-o', preprocessed_filename])
     solution = subprocess.run(["./kissat/build/kissat", "-q", preprocessed_filename], stdout=subprocess.PIPE).stdout.decode('utf8')
 
     if not keep_cnf:

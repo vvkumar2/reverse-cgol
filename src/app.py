@@ -19,7 +19,7 @@ def plot_grid(grid, title):
     return fig
 
 def main():
-    st.title('Reverse the Game of Life')
+    st.title('Reversing the Game of Life')
     st.write('Provide input as either a word or a grid of 0s and 1s.')
 
     input_method = st.radio('Choose input method:', ('Word', 'Grid'))
