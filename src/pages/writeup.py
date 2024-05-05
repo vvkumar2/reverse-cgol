@@ -1,5 +1,7 @@
 import streamlit as st
 
+st.set_page_config(page_title="Writeup")
+
 def show_writeup():
     st.title("Reversing Conway's Game of Life States")
 

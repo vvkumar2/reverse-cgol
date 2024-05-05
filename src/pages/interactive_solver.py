@@ -8,6 +8,8 @@ from matplotlib.colors import LinearSegmentedColormap
 from solver import solve_loop
 from utils import word_to_grid, plot_game_of_life
 
+st.set_page_config(page_title="Interactive Solver")
+
 
 def plot_grid(grid, title):
     colors = ["#0c1016", "#ffffff"]  # Dark grey for dead cells, white for live cells
