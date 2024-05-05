@@ -22,7 +22,7 @@ def plot_grid(grid, title):
 
     return fig
 
-def main():
+def show_interactive_solver():
     st.title('Reversing the Game of Life')
     st.write('Provide input as either a word or a grid of 0s and 1s.')
 
@@ -71,5 +71,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    show_interactive_solver()
 
