@@ -54,7 +54,7 @@ def main():
         status_text = st.empty()
         status_text.write('Solving for the earliest possible state (this might take a couple minutes)...')
 
-        result, num_iterations = solve_loop(grid, False, file_location='/app/')
+        result, num_iterations = solve_loop(grid, False)
         status_text.empty()
 
         if result is not None:
